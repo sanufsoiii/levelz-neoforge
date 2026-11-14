@@ -1,0 +1,125 @@
+plugins {
+    id 'java-library'
+    id 'net.neoforged.moddev' version '2.0.91'
+}
+
+version = mod_version
+group = mod_group_id
+
+base {
+    archivesName = 'levelz-neoforge'
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+neoForge {
+    version = project.neo_version
+
+    parchment {
+        mappingsVersion = project.parchment_version
+        minecraftVersion = project.parchment_minecraft_version
+    }
+
+    // src/main/resources/META-INF/accesstransformer.cfg is picked up automatically if present
+
+    runs {
+        client {
+            client()
+        }
+        server {
+            server()
+            programArgument '--nogui'
+        }
+        // Smoke test: the client must reach the title screen and exit by itself.
+        // The mod reads -Dlevelz.port.exitOnTitle=true.
+        clientSmoke {
+            client()
+            systemProperty 'levelz.port.exitOnTitle', 'true'
+        }
+        // Smoke test: dedicated server starts, ticks and stops by itself.
+        // The mod reads -Dlevelz.port.serverSmoke=true. Needs eula=true in run/eula.txt.
+        serverSmoke {
+            server()
+            programArgument '--nogui'
+            systemProperty 'levelz.port.serverSmoke', 'true'
+        }
+        configureEach {
+            systemProperty 'forge.logging.markers', 'REGISTRIES'
+            logLevel = org.slf4j.event.Level.INFO
+        }
+    }
+
+    mods {
+        "${mod_id}" {
+            sourceSet(sourceSets.main)
+        }
+    }
+}
+
+repositories {
+    // LibZ NeoForge port, published by ../../libz/port with ./gradlew publishToMavenLocal
+    mavenLocal {
+        content { includeGroup 'net.libz' }
+    }
+    maven { name = 'Shedaniel (Cloth Config, REI, Architectury)'; url = 'https://maven.shedaniel.me/' }
+    maven { name = 'Architectury'; url = 'https://maven.architectury.dev/' }
+    maven { name = 'TerraformersMC (EMI)'; url = 'https://maven.terraformersmc.com/' }
+    maven { name = 'Modrinth'; url = 'https://api.modrinth.com/maven' }
+    mavenCentral()
+}
+
+dependencies {
+    // Cloth Config (AutoConfig): required, same API as on Fabric.
+    implementation "me.shedaniel.cloth:cloth-config-neoforge:${cloth_config_version}"
+
+    // LibZ: required. Comes from mavenLocal after `./gradlew publishToMavenLocal` in ../../libz/port.
+    // -PwithoutLibz exists only for the baseline compile done before LibZ was published; drop it afterwards.
+    if (!project.hasProperty('withoutLibz')) {
+        implementation "net.libz:libz-neoforge:${libz_version}"
+        // Jankson is jar-in-jar inside LibZ; in dev it must be on the game classpath as a plain library.
+        additionalRuntimeClasspath "blue.endless:jankson:${jankson_version}"
+    }
+
+    // Optional integrations, compile-only (absent at runtime is fine).
+    compileOnly "dev.emi:emi-neoforge:${emi_version}"
+    compileOnly("me.shedaniel:RoughlyEnoughItems-neoforge:${rei_version}") { transitive = false }
+    compileOnly("me.shedaniel:RoughlyEnoughItems-api-neoforge:${rei_version}") { transitive = false }
+    compileOnly("dev.architectury:architectury-neoforge:${architectury_version}") { transitive = false } // REI API types (FluidStack)
+    compileOnly "maven.modrinth:jade:${jade_version}"
+    compileOnly "maven.modrinth:wthit:${wthit_version}"
+    compileOnly "maven.modrinth:accessories:${accessories_version_id}"
+    compileOnly "maven.modrinth:treechop:${treechop_version_id}"
+}
+
+var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
+    var replaceProperties = [
+            minecraft_version      : minecraft_version,
+            minecraft_version_range: minecraft_version_range,
+            neo_version            : neo_version,
+            neo_version_range      : neo_version_range,
+            loader_version_range   : loader_version_range,
+            mod_id                 : mod_id,
+            mod_name               : mod_name,
+            mod_license            : mod_license,
+            mod_version            : mod_version,
+            mod_authors            : mod_authors,
+            mod_description        : mod_description,
+            libz_version_range     : libz_version_range,
+    ]
+    inputs.properties replaceProperties
+    expand replaceProperties
+    from "src/main/templates"
+    into "build/generated/sources/modMetadata"
+}
+sourceSets.main.resources.srcDir generateModMetadata
+neoForge.ideSyncTask generateModMetadata
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release = 21
+    options.compilerArgs += ['-Xmaxerrs', '100000', '-Xmaxwarns', '0']
+}
+
+jar {
+    from('LICENSE') { rename { "${it}_levelz" } }
+}
