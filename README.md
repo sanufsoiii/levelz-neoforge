@@ -21,7 +21,7 @@ differently from the original (see below).
 ## Getting textures, models and translations
 
 All LevelZ assets (textures, models, translations) are **All Rights Reserved** by Globox_Z. They are **not included** in
-this port, and the datapack files (`data/levelz/`) are.
+this port; the datapack files (`data/levelz/`) are included.
 
 1. Download the original **LevelZ 2.0.13** for **Fabric 1.21.1** yourself: [CurseForge](https://www.curseforge.com/minecraft/mc-mods/levelz/files) or [Modrinth](https://modrinth.com/mod/levelz/version/2.0.13+1.21.1).
 2. Put the downloaded `.jar` into your `resourcepacks` folder. **Not** into `mods`.
