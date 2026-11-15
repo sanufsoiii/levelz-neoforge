@@ -1,7 +1,5 @@
 package net.levelz.util;
 
-import net.fabricmc.fabric.api.tag.convention.v2.ConventionalBlockTags;
-import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
 import net.levelz.access.LevelManagerAccess;
 import net.levelz.entity.LevelExperienceOrbEntity;
 import net.levelz.init.ConfigInit;
@@ -29,6 +27,7 @@ import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootParams;
+import net.neoforged.neoforge.common.Tags;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -207,7 +206,7 @@ public class BonusHelper {
     }
 
     public static void miningDropChanceBonus(Player playerEntity, BlockState state, BlockPos pos, LootParams.Builder builder) {
-        if (state.is(ConventionalBlockTags.ORES) && EnchantmentHelper.getEnchantmentLevel(playerEntity.registryAccess().registryOrThrow(Registries.ENCHANTMENT).getHolderOrThrow(Enchantments.SILK_TOUCH), playerEntity) <= 0) {
+        if (state.is(Tags.Blocks.ORES) && EnchantmentHelper.getEnchantmentLevel(playerEntity.registryAccess().registryOrThrow(Registries.ENCHANTMENT).getHolderOrThrow(Enchantments.SILK_TOUCH), playerEntity) <= 0) {
             if (LevelManager.BONUSES.containsKey("miningDropChance")) {
                 LevelManager levelManager = ((LevelManagerAccess) playerEntity).getLevelManager();
                 SkillBonus skillBonus = LevelManager.BONUSES.get("miningDropChance");
@@ -231,7 +230,7 @@ public class BonusHelper {
                 if (level >= skillBonus.getLevel() && playerEntity.getRandom().nextFloat() <= level * ConfigInit.CONFIG.plantDropChanceBonus) {
                     List<ItemStack> list = Block.getDrops(state, (ServerLevel) playerEntity.level(), pos, null);
                     for (ItemStack itemStack : list) {
-                        if (itemStack.is(ConventionalItemTags.CROPS)) {
+                        if (itemStack.is(Tags.Items.CROPS)) {
                             Block.popResource(playerEntity.level(), pos, itemStack);
                             break;
                         }

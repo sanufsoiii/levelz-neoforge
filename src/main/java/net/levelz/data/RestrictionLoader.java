@@ -5,7 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
+import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.levelz.LevelzMain;
 import net.levelz.editor.RestrictionEntry;
 import net.levelz.editor.RestrictionOverrides;
@@ -33,7 +33,7 @@ import java.io.InputStreamReader;
 import java.util.*;
 import java.util.function.Consumer;
 
-public record RestrictionLoader(HolderLookup.Provider wrapperLookup) implements SimpleSynchronousResourceReloadListener {
+public record RestrictionLoader(HolderLookup.Provider wrapperLookup) implements ResourceManagerReloadListener {
 
     public static final ResourceLocation ID = LevelzMain.identifierOf("restriction");
 
@@ -54,16 +54,6 @@ public record RestrictionLoader(HolderLookup.Provider wrapperLookup) implements 
 
     private interface EntryAction {
         void accept(int rawId, boolean fromTag);
-    }
-
-    @Override
-    public ResourceLocation getFabricId() {
-        return ID;
-    }
-
-    @Override
-    public Collection<ResourceLocation> getFabricDependencies() {
-        return List.of(SkillLoader.ID);
     }
 
     @Override

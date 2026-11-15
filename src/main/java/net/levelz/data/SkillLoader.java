@@ -3,7 +3,7 @@ package net.levelz.data;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
+import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.levelz.LevelzMain;
 import net.levelz.init.ConfigInit;
 import net.levelz.level.LevelManager;
@@ -19,16 +19,11 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import java.io.InputStreamReader;
 import java.util.*;
 
-public class SkillLoader implements SimpleSynchronousResourceReloadListener {
+public class SkillLoader implements ResourceManagerReloadListener {
 
     public static final ResourceLocation ID = LevelzMain.identifierOf("skill");
 
     private static final List<Integer> skillList = new ArrayList<>();
-
-    @Override
-    public ResourceLocation getFabricId() {
-        return ID;
-    }
 
     @Override
     public void onResourceManagerReload(ResourceManager manager) {
