@@ -1,7 +1,5 @@
 package net.levelz.screen;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.levelz.LevelzMain;
 import net.levelz.init.ConfigInit;
 import net.levelz.init.KeyInit;
@@ -21,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-@Environment(EnvType.CLIENT)
 public class SkillInfoScreen extends Screen implements Tab {
 
     public static final ResourceLocation BACKGROUND_TEXTURE = LevelzMain.identifierOf("textures/gui/skill_info_background.png");

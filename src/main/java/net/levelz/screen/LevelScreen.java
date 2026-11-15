@@ -1,9 +1,7 @@
 package net.levelz.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.neoforged.neoforge.network.PacketDistributor;
 import net.levelz.LevelzMain;
 import net.levelz.access.ClientPlayerAccess;
 import net.levelz.access.LevelManagerAccess;
@@ -35,7 +33,6 @@ import org.joml.Vector3f;
 
 import java.util.*;
 
-@Environment(EnvType.CLIENT)
 public class LevelScreen extends Screen implements Tab {
 
     public static final ResourceLocation BACKGROUND_TEXTURE = LevelzMain.identifierOf("textures/gui/skill_background.png");
@@ -70,7 +67,7 @@ public class LevelScreen extends Screen implements Tab {
     @Override
     protected void init() {
         super.init();
-        ClientPlayNetworking.send(new AttributeSyncPacket());
+        PacketDistributor.sendToServer(new AttributeSyncPacket());
 
         this.x = (this.width - this.backgroundWidth) / 2;
         this.y = (this.height - this.backgroundHeight) / 2;
@@ -110,7 +107,7 @@ public class LevelScreen extends Screen implements Tab {
             this.levelButtons[i] = this.addRenderableWidget(new WidgetButtonPage(this.x + (i % 2 == 0 ? 80 : 169), this.y + 91 + i / 2 * 20, 13, 13, 33, 42, true, true, null, button -> {
                 int skillIndex = this.skillRow * 2 + buttonIndex;
                 if (skillIndex < this.skillIds.size()) {
-                    ClientPlayNetworking.send(new StatPacket(this.skillIds.get(skillIndex), 1));
+                    PacketDistributor.sendToServer(new StatPacket(this.skillIds.get(skillIndex), 1));
                 }
             }));
         }

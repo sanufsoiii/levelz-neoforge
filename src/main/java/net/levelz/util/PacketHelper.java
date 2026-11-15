@@ -1,6 +1,6 @@
 package net.levelz.util;
 
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.neoforged.neoforge.network.PacketDistributor;
 import net.levelz.access.LevelManagerAccess;
 import net.levelz.level.*;
 import net.levelz.network.packet.*;
@@ -22,7 +22,7 @@ public class PacketHelper {
         int totalLevelExperience = levelManager.getTotalLevelExperience();
         float levelProgress = levelManager.getLevelProgress();
 
-        ServerPlayNetworking.send(serverPlayerEntity, new LevelPacket(overallLevel, skillPoints, totalLevelExperience, levelProgress));
+        PacketDistributor.sendToPlayer(serverPlayerEntity, new LevelPacket(overallLevel, skillPoints, totalLevelExperience, levelProgress));
     }
 
     public static void updateSkills(ServerPlayer serverPlayerEntity) {
@@ -42,7 +42,7 @@ public class PacketHelper {
         }
 
         SkillSyncPacket.SkillBonusesRecord skillBonusesRecord = new SkillSyncPacket.SkillBonusesRecord(skillBonuses);
-        ServerPlayNetworking.send(serverPlayerEntity, new SkillSyncPacket(skillIds, skillKeys, skillMaxLevels, skillAttributes, skillBonusesRecord));
+        PacketDistributor.sendToPlayer(serverPlayerEntity, new SkillSyncPacket(skillIds, skillKeys, skillMaxLevels, skillAttributes, skillBonusesRecord));
     }
 
     public static void updatePlayerSkills(ServerPlayer serverPlayerEntity, @Nullable ServerPlayer oldPlayerEntity) {
@@ -62,11 +62,11 @@ public class PacketHelper {
             playerSkillLevels.add(playerSkill.getLevel());
         }
 
-        ServerPlayNetworking.send(serverPlayerEntity, new PlayerSkillSyncPacket(playerSkillIds, playerSkillLevels));
+        PacketDistributor.sendToPlayer(serverPlayerEntity, new PlayerSkillSyncPacket(playerSkillIds, playerSkillLevels));
     }
 
     public static void updateRestrictions(ServerPlayer serverPlayerEntity) {
-        ServerPlayNetworking.send(serverPlayerEntity, new RestrictionPacket(new RestrictionPacket.RestrictionRecord(LevelManager.BLOCK_RESTRICTIONS.keySet().stream().toList(), LevelManager.BLOCK_RESTRICTIONS.values().stream().toList()),
+        PacketDistributor.sendToPlayer(serverPlayerEntity, new RestrictionPacket(new RestrictionPacket.RestrictionRecord(LevelManager.BLOCK_RESTRICTIONS.keySet().stream().toList(), LevelManager.BLOCK_RESTRICTIONS.values().stream().toList()),
                 new RestrictionPacket.RestrictionRecord(LevelManager.CRAFTING_RESTRICTIONS.keySet().stream().toList(), LevelManager.CRAFTING_RESTRICTIONS.values().stream().toList()), new RestrictionPacket.RestrictionRecord(LevelManager.ENTITY_RESTRICTIONS.keySet().stream().toList(), LevelManager.ENTITY_RESTRICTIONS.values().stream().toList()),
                 new RestrictionPacket.RestrictionRecord(LevelManager.ITEM_RESTRICTIONS.keySet().stream().toList(), LevelManager.ITEM_RESTRICTIONS.values().stream().toList()), new RestrictionPacket.RestrictionRecord(LevelManager.MINING_RESTRICTIONS.keySet().stream().toList(), LevelManager.MINING_RESTRICTIONS.values().stream().toList()),
                 new RestrictionPacket.RestrictionRecord(LevelManager.ENCHANTMENT_RESTRICTIONS.keySet().stream().toList(), LevelManager.ENCHANTMENT_RESTRICTIONS.values().stream().toList()),
@@ -82,6 +82,6 @@ public class PacketHelper {
             ids.add(entry.getValue().getEntry().getRegisteredName());
             levels.add(entry.getValue().getLevel());
         }
-        ServerPlayNetworking.send(serverPlayerEntity, new EnchantmentZPacket(EnchantmentRegistry.INDEX_ENCHANTMENTS, keys, ids, levels));
+        PacketDistributor.sendToPlayer(serverPlayerEntity, new EnchantmentZPacket(EnchantmentRegistry.INDEX_ENCHANTMENTS, keys, ids, levels));
     }
 }

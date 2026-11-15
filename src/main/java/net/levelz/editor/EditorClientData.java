@@ -1,14 +1,11 @@
 package net.levelz.editor;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.levelz.network.packet.EditorResultPacket;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Environment(EnvType.CLIENT)
 public class EditorClientData {
 
     public static final List<RestrictionEntry> ENTRIES = new ArrayList<>();

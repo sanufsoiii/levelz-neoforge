@@ -3,7 +3,7 @@ package net.levelz.editor;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.neoforged.neoforge.network.PacketDistributor;
 import net.levelz.data.DatapackErrors;
 import net.levelz.data.RestrictionLoader;
 import net.levelz.level.LevelManager;
@@ -36,7 +36,7 @@ public class RestrictionEditor {
             return;
         }
         List<String> skills = LevelManager.SKILLS.values().stream().map(Skill::getKey).toList();
-        ServerPlayNetworking.send(serverPlayerEntity, new EditorDataPacket(List.copyOf(RestrictionLoader.ENTRIES), skills, DatapackErrors.getErrors(), openScreen));
+        PacketDistributor.sendToPlayer(serverPlayerEntity, new EditorDataPacket(List.copyOf(RestrictionLoader.ENTRIES), skills, DatapackErrors.getErrors(), openScreen));
     }
 
     public static void save(ServerPlayer serverPlayerEntity, String key, String json, int baseHash) {
@@ -105,7 +105,7 @@ public class RestrictionEditor {
         RestrictionLoader.reloadRestrictions(server);
         String source = " " + RestrictionLoader.getOverrideSource(key);
         List<String> problems = DatapackErrors.getErrors().stream().filter(problem -> problem.contains(source)).toList();
-        ServerPlayNetworking.send(serverPlayerEntity, new EditorResultPacket(key, true, message, List.of(), problems));
+        PacketDistributor.sendToPlayer(serverPlayerEntity, new EditorResultPacket(key, true, message, List.of(), problems));
         sendEditorData(serverPlayerEntity, false);
     }
 
@@ -144,11 +144,11 @@ public class RestrictionEditor {
             return;
         }
         LOGGER.info("{} exported the restriction overrides to {}", serverPlayerEntity.getName().getString(), root);
-        ServerPlayNetworking.send(serverPlayerEntity, new EditorResultPacket("", true, "editor.levelz.exported", List.of(root.toString(), String.valueOf(skipped)), List.of()));
+        PacketDistributor.sendToPlayer(serverPlayerEntity, new EditorResultPacket("", true, "editor.levelz.exported", List.of(root.toString(), String.valueOf(skipped)), List.of()));
     }
 
     private static void sendResult(ServerPlayer serverPlayerEntity, String key, boolean success, String message) {
-        ServerPlayNetworking.send(serverPlayerEntity, new EditorResultPacket(key, success, message, List.of(), List.of()));
+        PacketDistributor.sendToPlayer(serverPlayerEntity, new EditorResultPacket(key, success, message, List.of(), List.of()));
     }
 
 }

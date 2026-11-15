@@ -3,9 +3,7 @@ package net.levelz.screen;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.neoforged.neoforge.network.PacketDistributor;
 import net.levelz.editor.EditorClientData;
 import net.levelz.editor.RestrictionEntry;
 import net.levelz.editor.RestrictionOverrides;
@@ -31,7 +29,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-@Environment(EnvType.CLIENT)
 public class RestrictionEditorScreen extends Screen {
 
     public static final List<String> CATEGORIES = List.of("blocks", "crafting", "entities", "items", "mining", "enchantments", "components", "dimensions");
@@ -87,11 +84,11 @@ public class RestrictionEditorScreen extends Screen {
                 this.minecraft.setScreen(new RestrictionEditScreen(this, this.selectedEntry));
             }
         }).bounds(this.width / 2 - 50, editButtonY, 100, 20).build());
-        this.addRenderableWidget(Button.builder(Component.translatable("editor.levelz.export"), button -> ClientPlayNetworking.send(new EditorExportPacket()))
+        this.addRenderableWidget(Button.builder(Component.translatable("editor.levelz.export"), button -> PacketDistributor.sendToServer(new EditorExportPacket()))
                 .bounds(this.width / 2 + 55, editButtonY, 100, 20).build());
 
         int buttonY = this.height - 28;
-        this.addRenderableWidget(Button.builder(Component.translatable("editor.levelz.refresh"), button -> ClientPlayNetworking.send(new EditorRequestPacket()))
+        this.addRenderableWidget(Button.builder(Component.translatable("editor.levelz.refresh"), button -> PacketDistributor.sendToServer(new EditorRequestPacket()))
                 .bounds(this.width / 2 - 155, buttonY, 100, 20).build());
         this.problemsButton = this.addRenderableWidget(Button.builder(Component.empty(), button -> {
             this.showProblems = !this.showProblems;

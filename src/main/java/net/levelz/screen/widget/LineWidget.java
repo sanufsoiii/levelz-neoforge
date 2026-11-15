@@ -1,7 +1,5 @@
 package net.levelz.screen.widget;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.levelz.LevelzMain;
 import net.levelz.level.LevelManager;
 import net.levelz.level.restriction.PlayerRestriction;
@@ -32,7 +30,6 @@ import org.jetbrains.annotations.Nullable;
 import java.io.FileNotFoundException;
 import java.util.*;
 
-@Environment(EnvType.CLIENT)
 public class LineWidget {
 
     private final Minecraft client;

@@ -5,9 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.neoforged.neoforge.network.PacketDistributor;
 import net.levelz.editor.EditorClientData;
 import net.levelz.editor.RestrictionEntry;
 import net.levelz.editor.RestrictionOverrides;
@@ -49,7 +47,6 @@ import org.lwjgl.glfw.GLFW;
 import java.util.*;
 import java.util.stream.Stream;
 
-@Environment(EnvType.CLIENT)
 public class RestrictionEditScreen extends Screen {
 
     private static final int SLOT_SIZE = 18;
@@ -291,14 +288,14 @@ public class RestrictionEditScreen extends Screen {
             return;
         }
         this.key = name;
-        ClientPlayNetworking.send(new EditorSavePacket(name, json.toString(), this.baseHash));
+        PacketDistributor.sendToServer(new EditorSavePacket(name, json.toString(), this.baseHash));
         this.setStatus(Component.translatable("editor.levelz.saving").withStyle(ChatFormatting.GRAY));
     }
 
     private void confirmDelete() {
         this.minecraft.setScreen(new ConfirmScreen(confirmed -> {
             if (confirmed) {
-                ClientPlayNetworking.send(new EditorDeletePacket(this.key, this.baseHash));
+                PacketDistributor.sendToServer(new EditorDeletePacket(this.key, this.baseHash));
             }
             this.minecraft.setScreen(this);
         }, Component.translatable("editor.levelz.delete_confirm", this.key), Component.translatable("editor.levelz.delete_confirm_message")));
