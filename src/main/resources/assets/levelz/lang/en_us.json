@@ -1,0 +1,13 @@
+{
+  "levelz.port.assets.pack_name": "LevelZ: original assets",
+  "levelz.port.assets.pack_description": "Textures, models and translations from your original LevelZ jar",
+  "levelz.port.assets.title": "LevelZ — unofficial NeoForge port",
+  "levelz.port.assets.text": "The original textures, models, sounds and translations are copyrighted (All Rights Reserved), so they are not included in this port. Download the original mod for Fabric 1.21.1 and put the jar into the resourcepacks folder — the port will use only its graphics and translations from it. You do not need to put it into the mods folder.",
+  "levelz.port.assets.curseforge": "Download original (CurseForge)",
+  "levelz.port.assets.modrinth": "Download original (Modrinth)",
+  "levelz.port.assets.open_folder": "Open resourcepacks folder",
+  "levelz.port.assets.recheck": "Check again",
+  "levelz.port.assets.continue": "Continue without assets",
+  "levelz.port.assets.dont_show": "Don't show again",
+  "levelz.port.assets.not_found": "File not found in resourcepacks"
+}

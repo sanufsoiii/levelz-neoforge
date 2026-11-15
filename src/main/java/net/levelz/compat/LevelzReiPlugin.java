@@ -5,13 +5,11 @@ import me.shedaniel.rei.api.client.registry.display.DisplayRegistry;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
 import me.shedaniel.rei.api.common.util.EntryStacks;
 import me.shedaniel.rei.plugin.common.displays.brewing.DefaultBrewingDisplay;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.levelz.init.ItemInit;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
-@Environment(EnvType.CLIENT)
+@me.shedaniel.rei.forge.REIPluginClient
 public class LevelzReiPlugin implements REIClientPlugin {
 
     @Override

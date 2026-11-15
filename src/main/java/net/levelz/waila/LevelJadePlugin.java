@@ -6,6 +6,7 @@ import snownee.jade.api.IWailaClientRegistration;
 import snownee.jade.api.IWailaCommonRegistration;
 import snownee.jade.api.IWailaPlugin;
 
+@snownee.jade.api.WailaPlugin
 public class LevelJadePlugin implements IWailaPlugin {
 
     @Override

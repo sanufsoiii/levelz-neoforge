@@ -8,6 +8,7 @@ import net.levelz.LevelzMain;
 import net.levelz.init.ItemInit;
 import net.minecraft.world.item.Items;
 
+@dev.emi.emi.api.EmiEntrypoint
 public class LevelzEmiPlugin implements EmiPlugin {
 
     @Override

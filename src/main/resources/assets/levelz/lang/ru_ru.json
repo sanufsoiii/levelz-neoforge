@@ -1,0 +1,13 @@
+{
+  "levelz.port.assets.pack_name": "LevelZ: оригинальные ассеты",
+  "levelz.port.assets.pack_description": "Текстуры, модели и переводы из вашего оригинального jar LevelZ",
+  "levelz.port.assets.title": "LevelZ — неофициальный порт для NeoForge",
+  "levelz.port.assets.text": "Оригинальные текстуры, модели, звуки и переводы защищены авторским правом (All Rights Reserved), поэтому их нет в порте. Скачай оригинальный мод для Fabric 1.21.1 и положи jar в папку resourcepacks — порт подключит из него только графику и переводы. Ставить его в mods не нужно.",
+  "levelz.port.assets.curseforge": "Скачать оригинал (CurseForge)",
+  "levelz.port.assets.modrinth": "Скачать оригинал (Modrinth)",
+  "levelz.port.assets.open_folder": "Открыть папку resourcepacks",
+  "levelz.port.assets.recheck": "Проверить снова",
+  "levelz.port.assets.continue": "Продолжить без ассетов",
+  "levelz.port.assets.dont_show": "Больше не показывать",
+  "levelz.port.assets.not_found": "Файл не найден в resourcepacks"
+}
