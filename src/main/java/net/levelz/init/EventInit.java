@@ -67,6 +67,13 @@ public class EventInit {
             }
         });
 
+        // A player can disconnect after dying but before confirming the respawn; do not keep the old entity until then.
+        gameBus.addListener(PlayerEvent.PlayerLoggedOutEvent.class, event -> {
+            if (event.getEntity() instanceof ServerPlayer player) {
+                RESPAWN_ORIGINALS.remove(player.getUUID());
+            }
+        });
+
         // Fabric ServerPlayerEvents.AFTER_RESPAWN -> PlayerEvent.PlayerRespawnEvent (end of PlayerList.respawn).
         // "alive" of Fabric == "end conquered" of NeoForge.
         gameBus.addListener(PlayerEvent.PlayerRespawnEvent.class, event -> {
