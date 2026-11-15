@@ -39,7 +39,12 @@ cd ../../libz/port && ./gradlew publishToMavenLocal
 cd ../../levelz/port && ./gradlew build
 ```
 
-The mod jar is in `build/libs/`.
+The mod jar is in `build/libs/`. To let the Medieval Weapons port link against LevelZ as an optional dependency,
+publish this port too:
+
+```bash
+cd ../../levelz/port && ./gradlew publishToMavenLocal
+```
 
 ## Reporting bugs
 
