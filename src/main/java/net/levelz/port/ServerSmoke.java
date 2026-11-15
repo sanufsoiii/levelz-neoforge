@@ -35,6 +35,9 @@ public final class ServerSmoke {
     private static int ticksLeft = -1;
     private static int spawned = 0;
     private static int entityTypes = 0;
+    private static int itemTypes = 0;
+    private static int criteriaTypes = 0;
+    private static int mixinTargetFailures = 0;
 
     private ServerSmoke() {
     }
@@ -52,6 +55,10 @@ public final class ServerSmoke {
         ServerLevel level = server.overworld();
         BlockPos spawn = level.getSharedSpawnPos();
         LOGGER.info("[levelz-port] SERVER_SMOKE_START dedicated={} spawn={}", server.isDedicatedServer(), spawn.toShortString());
+
+        // Load every mixin target first: audit() only sees classes that are already loaded.
+        mixinTargetFailures = MixinTargetLoader.load(LOGGER, MixinTargetLoader.COMMON);
+        LOGGER.info("[levelz-port] SERVER_SMOKE mixin targets={} failures={}", MixinTargetLoader.COMMON.size(), mixinTargetFailures);
 
         // Apply every pending mixin now, so a broken target fails here and not when some class is first used in game.
         MixinEnvironment.getCurrentEnvironment().audit();
@@ -82,6 +89,17 @@ public final class ServerSmoke {
                 LOGGER.error("[levelz-port] SERVER_SMOKE could not spawn {}", BuiltInRegistries.ENTITY_TYPE.getKey(type));
             }
         }
+        for (var item : BuiltInRegistries.ITEM) {
+            if (net.levelz.LevelzMain.MOD_ID.equals(BuiltInRegistries.ITEM.getKey(item).getNamespace())) {
+                itemTypes++;
+            }
+        }
+        for (var criterion : BuiltInRegistries.TRIGGER_TYPES) {
+            if (net.levelz.LevelzMain.MOD_ID.equals(BuiltInRegistries.TRIGGER_TYPES.getKey(criterion).getNamespace())) {
+                criteriaTypes++;
+            }
+        }
+        LOGGER.info("[levelz-port] SERVER_SMOKE registries: items={} entity_types={} criteria={}", itemTypes, entityTypes, criteriaTypes);
 
         LOGGER.info("[levelz-port] SERVER_SMOKE data: skills={} bonuses={} block={} crafting={} entity={} item={} mining={} enchantment={} component={} dimension={} datapack_errors={}",
                 LevelManager.SKILLS.size(), LevelManager.BONUSES.size(), LevelManager.BLOCK_RESTRICTIONS.size(), LevelManager.CRAFTING_RESTRICTIONS.size(),
@@ -109,6 +127,10 @@ public final class ServerSmoke {
             LOGGER.error("[levelz-port] SERVER_SMOKE_FAILED skills={} block_restrictions={}", LevelManager.SKILLS.size(), LevelManager.BLOCK_RESTRICTIONS.size());
         } else if (!DatapackErrors.getErrors().isEmpty()) {
             LOGGER.error("[levelz-port] SERVER_SMOKE_FAILED datapack_errors={}", DatapackErrors.getErrors().size());
+        } else if (itemTypes != 2 || criteriaTypes != 2) {
+            LOGGER.error("[levelz-port] SERVER_SMOKE_FAILED items={} criteria={}", itemTypes, criteriaTypes);
+        } else if (mixinTargetFailures != 0) {
+            LOGGER.error("[levelz-port] SERVER_SMOKE_FAILED mixin_target_failures={}", mixinTargetFailures);
         } else {
             LOGGER.info("[levelz-port] SERVER_SMOKE_OK entities={} skills={} restrictions={} ticks={}", spawned, LevelManager.SKILLS.size(),
                     LevelManager.BLOCK_RESTRICTIONS.size() + LevelManager.CRAFTING_RESTRICTIONS.size() + LevelManager.ENTITY_RESTRICTIONS.size()

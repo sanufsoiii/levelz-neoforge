@@ -43,6 +43,9 @@ public final class ClientSmoke {
         titleReached = true;
         LOGGER.info("[levelz-port] TITLE_SCREEN_REACHED");
         if (Boolean.getBoolean(EXIT_ON_TITLE)) {
+            // Load every mixin target first: audit() only sees classes that are already loaded.
+            int targetFailures = MixinTargetLoader.load(LOGGER, MixinTargetLoader.COMMON) + MixinTargetLoader.load(LOGGER, MixinTargetLoader.CLIENT);
+            LOGGER.info("[levelz-port] CLIENT_MIXIN_TARGETS targets={} failures={}", MixinTargetLoader.COMMON.size() + MixinTargetLoader.CLIENT.size(), targetFailures);
             // Force every client mixin of the pack to apply now, so a broken target fails here instead of in game.
             MixinEnvironment.getCurrentEnvironment().audit();
             LOGGER.info("[levelz-port] CLIENT_MIXIN_AUDIT_OK");
