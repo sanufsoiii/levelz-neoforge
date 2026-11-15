@@ -2,12 +2,12 @@ package net.levelz.init;
 
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
-import net.fabricmc.loader.api.FabricLoader;
 import net.levelz.config.LevelzConfig;
+import net.neoforged.fml.ModList;
 
 public class ConfigInit {
 
-    public static final boolean isOriginsLoaded = FabricLoader.getInstance().isModLoaded("origins");
+    public static final boolean isOriginsLoaded = ModList.get().isLoaded("origins");
 
     public static LevelzConfig CONFIG = new LevelzConfig();
 

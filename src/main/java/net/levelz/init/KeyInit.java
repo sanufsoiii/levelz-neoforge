@@ -1,29 +1,30 @@
 package net.levelz.init;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import com.mojang.blaze3d.platform.InputConstants;
 import net.levelz.screen.LevelScreen;
 import net.minecraft.client.KeyMapping;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import org.lwjgl.glfw.GLFW;
-import com.mojang.blaze3d.platform.InputConstants;
+
 import java.io.FileWriter;
 import java.io.IOException;
 
-@Environment(EnvType.CLIENT)
 public class KeyInit {
     public static KeyMapping screenKey = new KeyMapping("key.levelz.openskillscreen", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_K, "category.levelz.keybind");
     public static KeyMapping devKey = new KeyMapping("key.levelz.dev", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_F8, "category.levelz.keybind");
 
-    public static void init() {
+    public static void init(IEventBus modBus, IEventBus gameBus) {
         // Registering
-        KeyBindingHelper.registerKeyBinding(screenKey);
+        modBus.addListener(RegisterKeyMappingsEvent.class, event -> {
+            // Only the skill screen key is registered, exactly like the original (devKey is used through matches()).
+            event.register(screenKey);
+        });
         // Callback
-        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+        gameBus.addListener(ClientTickEvent.Post.class, client -> {
             if (screenKey.consumeClick()) {
-                client.setScreen(new LevelScreen());
-                return;
+                net.minecraft.client.Minecraft.getInstance().setScreen(new LevelScreen());
             }
         });
     }

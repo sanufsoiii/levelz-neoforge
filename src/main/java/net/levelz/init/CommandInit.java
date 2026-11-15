@@ -3,7 +3,6 @@ package net.levelz.init;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.levelz.access.LevelManagerAccess;
 import net.levelz.access.ServerPlayerSyncAccess;
 import net.levelz.data.DatapackErrors;
@@ -20,6 +19,8 @@ import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
 import net.minecraft.server.level.ServerPlayer;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collection;
@@ -29,8 +30,9 @@ public class CommandInit {
     private static final SuggestionProvider<CommandSourceStack> SKILLS_SUGGESTION_PROVIDER = (context, builder) -> SharedSuggestionProvider.suggest(
             LevelManager.SKILLS.values().stream().map(Skill::getKey), builder);
 
-    public static void init() {
-        CommandRegistrationCallback.EVENT.register((dispatcher, dedicated, environment) -> {
+    public static void init(IEventBus gameBus) {
+        gameBus.addListener(RegisterCommandsEvent.class, event -> {
+            var dispatcher = event.getDispatcher();
             dispatcher.register((Commands.literal("level").requires((serverCommandSource) -> {
                 return serverCommandSource.hasPermission(2);
             })).then(Commands.argument("targets", EntityArgument.players())

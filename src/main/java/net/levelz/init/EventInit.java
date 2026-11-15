@@ -1,11 +1,5 @@
 package net.levelz.init;
 
-import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
-import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
-import net.fabricmc.fabric.api.event.player.UseBlockCallback;
-import net.fabricmc.fabric.api.event.player.UseEntityCallback;
-import net.fabricmc.fabric.api.event.player.UseItemCallback;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.levelz.access.LevelManagerAccess;
 import net.levelz.data.DatapackErrors;
 import net.levelz.level.LevelManager;
@@ -18,40 +12,79 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.entity.player.Player;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+
 import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class EventInit {
 
-    public static void init() {
-        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
-            for (Skill skill : LevelManager.SKILLS.values()) {
-                LevelHelper.updateSkill(handler.getPlayer(), skill);
+    // Fabric's COPY_FROM + AFTER_RESPAWN get the old player in one event; NeoForge's PlayerRespawnEvent does not have it,
+    // so the original is remembered in PlayerEvent.Clone (fired from ServerPlayer.restoreFrom right before it).
+    private static final Map<UUID, ServerPlayer> RESPAWN_ORIGINALS = new ConcurrentHashMap<>();
+
+    public static void init(IEventBus gameBus) {
+        // Fabric ServerPlayConnectionEvents.JOIN -> PlayerLoggedInEvent (end of PlayerList.placeNewPlayer).
+        gameBus.addListener(PlayerEvent.PlayerLoggedInEvent.class, event -> {
+            if (!(event.getEntity() instanceof ServerPlayer player)) {
+                return;
             }
-            PacketHelper.syncEnchantments(handler.getPlayer());
-            PacketHelper.updateSkills(handler.getPlayer());
-            PacketHelper.updatePlayerSkills(handler.getPlayer(), null);
-            PacketHelper.updateRestrictions(handler.getPlayer());
-            DatapackErrors.notify(handler.getPlayer());
+            for (Skill skill : LevelManager.SKILLS.values()) {
+                LevelHelper.updateSkill(player, skill);
+            }
+            PacketHelper.syncEnchantments(player);
+            PacketHelper.updateSkills(player);
+            PacketHelper.updatePlayerSkills(player, null);
+            PacketHelper.updateRestrictions(player);
+            DatapackErrors.notify(player);
         });
 
-        ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.register((player, origin, destination) -> {
+        // Fabric ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.
+        gameBus.addListener(PlayerEvent.PlayerChangedDimensionEvent.class, event -> {
+            if (!(event.getEntity() instanceof ServerPlayer player)) {
+                return;
+            }
             PacketHelper.updatePlayerSkills(player, null);
             PacketHelper.updateLevels(player);
         });
 
-        ServerPlayerEvents.COPY_FROM.register((oldPlayer, newPlayer, alive) -> {
-            if (alive) {
+        // Fabric ServerPlayerEvents.COPY_FROM -> PlayerEvent.Clone (last line of ServerPlayer.restoreFrom).
+        gameBus.addListener(PlayerEvent.Clone.class, event -> {
+            if (!(event.getEntity() instanceof ServerPlayer newPlayer) || !(event.getOriginal() instanceof ServerPlayer oldPlayer)) {
+                return;
+            }
+            RESPAWN_ORIGINALS.put(newPlayer.getUUID(), oldPlayer);
+            if (!event.isWasDeath()) {
                 PacketHelper.updatePlayerSkills(newPlayer, oldPlayer);
                 PacketHelper.updateLevels(newPlayer);
             }
         });
 
-        ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, newPlayer, alive) -> {
+        // Fabric ServerPlayerEvents.AFTER_RESPAWN -> PlayerEvent.PlayerRespawnEvent (end of PlayerList.respawn).
+        // "alive" of Fabric == "end conquered" of NeoForge.
+        gameBus.addListener(PlayerEvent.PlayerRespawnEvent.class, event -> {
+            if (!(event.getEntity() instanceof ServerPlayer newPlayer)) {
+                return;
+            }
+            ServerPlayer oldPlayer = RESPAWN_ORIGINALS.remove(newPlayer.getUUID());
+            if (oldPlayer == null) {
+                return;
+            }
+            boolean alive = event.isEndConquered();
             LevelManager newLevelManager = ((LevelManagerAccess) newPlayer).getLevelManager();
+
+            // Fabric also fires AFTER_PLAYER_CHANGE_WORLD when a respawn moves the player to another dimension.
+            if (oldPlayer.level().dimension() != newPlayer.level().dimension()) {
+                PacketHelper.updatePlayerSkills(newPlayer, null);
+                PacketHelper.updateLevels(newPlayer);
+            }
 
             if (alive) {
                 for (Skill skill : LevelManager.SKILLS.values()) {
@@ -121,45 +154,64 @@ public class EventInit {
             }
         });
 
-        UseItemCallback.EVENT.register((player, world, hand) -> {
+        // Fabric UseItemCallback -> PlayerInteractEvent.RightClickItem (both sides, before the item is used).
+        gameBus.addListener(PlayerInteractEvent.RightClickItem.class, event -> {
+            Player player = event.getEntity();
             if (!player.isCreative() && !player.isSpectator()) {
                 LevelManager levelManager = ((LevelManagerAccess) player).getLevelManager();
-                if (!levelManager.hasRequiredStackLevel(player.getItemInHand(hand))) {
+                if (!levelManager.hasRequiredStackLevel(player.getItemInHand(event.getHand()))) {
                     // player.sendMessage(Text.translatable("item.levelz." + customList.get(customList.indexOf(string) + 1) +
                     // ".tooltip", customList.get(customList.indexOf(string) + 2)).formatted(Formatting.RED), true);
                     player.displayClientMessage(Component.translatable("restriction.levelz.locked.tooltip").withStyle(ChatFormatting.RED), true);
-                    return InteractionResultHolder.fail(player.getItemInHand(hand));
+                    event.setCanceled(true);
+                    event.setCancellationResult(InteractionResult.FAIL);
                 }
             }
-            return InteractionResultHolder.pass(ItemStack.EMPTY);
         });
 
-        UseBlockCallback.EVENT.register((player, world, hand, result) -> {
+        // Fabric UseBlockCallback -> PlayerInteractEvent.RightClickBlock (both sides, before the block is used).
+        gameBus.addListener(PlayerInteractEvent.RightClickBlock.class, event -> {
+            Player player = event.getEntity();
             if (!player.isCreative() && !player.isSpectator()) {
-                BlockPos blockPos = result.getBlockPos();
-                if (world.mayInteract(player, blockPos)) {
+                BlockPos blockPos = event.getPos();
+                if (event.getLevel().mayInteract(player, blockPos)) {
                     LevelManager levelManager = ((LevelManagerAccess) player).getLevelManager();
-                    if (!levelManager.hasRequiredBlockLevel(world.getBlockState(blockPos).getBlock())) {
+                    if (!levelManager.hasRequiredBlockLevel(event.getLevel().getBlockState(blockPos).getBlock())) {
                         player.displayClientMessage(Component.translatable("restriction.levelz.locked.tooltip").withStyle(ChatFormatting.RED), true);
-                        return InteractionResult.sidedSuccess(false);
+                        event.setCanceled(true);
+                        event.setCancellationResult(InteractionResult.CONSUME);
                     }
                 }
             }
-            return InteractionResult.PASS;
+            return;
         });
 
-        UseEntityCallback.EVENT.register((player, world, hand, entity, entityHitResult) -> {
-            if (!player.isCreative() && !player.isSpectator()) {
-                if (!entity.hasControllingPassenger() || !((EntityAccessor) entity).callCanAddPassenger(player)) {
-                    LevelManager levelManager = ((LevelManagerAccess) player).getLevelManager();
-                    if (!levelManager.hasRequiredEntityLevel(entity.getType())) {
-                        player.displayClientMessage(Component.translatable("restriction.levelz.locked.tooltip").withStyle(ChatFormatting.RED), true);
-                        return InteractionResult.sidedSuccess(false);
-                    }
-                }
+        // Fabric UseEntityCallback is called for both interact and interactAt; NeoForge has one event for each.
+        gameBus.addListener(PlayerInteractEvent.EntityInteract.class, event -> {
+            if (cancelEntityInteraction(event.getEntity(), event.getTarget())) {
+                event.setCanceled(true);
+                event.setCancellationResult(InteractionResult.CONSUME);
             }
-            return InteractionResult.PASS;
+        });
+        gameBus.addListener(PlayerInteractEvent.EntityInteractSpecific.class, event -> {
+            if (cancelEntityInteraction(event.getEntity(), event.getTarget())) {
+                event.setCanceled(true);
+                event.setCancellationResult(InteractionResult.CONSUME);
+            }
         });
     }
 
+    private static boolean cancelEntityInteraction(Player player, net.minecraft.world.entity.Entity entity) {
+        if (player.isCreative() || player.isSpectator()) {
+            return false;
+        }
+        if (!entity.hasControllingPassenger() || !((EntityAccessor) entity).callCanAddPassenger(player)) {
+            LevelManager levelManager = ((LevelManagerAccess) player).getLevelManager();
+            if (!levelManager.hasRequiredEntityLevel(entity.getType())) {
+                player.displayClientMessage(Component.translatable("restriction.levelz.locked.tooltip").withStyle(ChatFormatting.RED), true);
+                return true;
+            }
+        }
+        return false;
+    }
 }
