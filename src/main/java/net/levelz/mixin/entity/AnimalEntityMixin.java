@@ -25,7 +25,7 @@ public abstract class AnimalEntityMixin extends AgeableMob {
         super(entityType, world);
     }
 
-    @Inject(method = "spawnChildFromBreeding(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/animal/Animal;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;addFreshEntityWithPassengers(Lnet/minecraft/world/entity/Entity;)V"), locals = LocalCapture.CAPTURE_FAILSOFT)
+    @Inject(method = "spawnChildFromBreeding(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/animal/Animal;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;addFreshEntityWithPassengers(Lnet/minecraft/world/entity/Entity;)V"), locals = LocalCapture.CAPTURE_FAILHARD)
     private void breedMixin(ServerLevel world, Animal other, CallbackInfo info, AgeableMob passiveEntity) {
         if (getLoveCause() != null || other.getLoveCause() != null) {
             BonusHelper.breedTwinChanceBonus(world, getLoveCause() != null ? getLoveCause() : other.getLoveCause(), passiveEntity, other);

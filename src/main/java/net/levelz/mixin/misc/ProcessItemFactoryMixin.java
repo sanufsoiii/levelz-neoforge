@@ -27,7 +27,7 @@ import java.util.Map;
 @Mixin(VillagerTrades.ItemsAndEmeraldsToItems.class)
 public class ProcessItemFactoryMixin {
 
-    @Inject(method = "method_59950", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/enchantment/EnchantmentHelper;enchantItemFromProvider(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/core/RegistryAccess;Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/world/DifficultyInstance;Lnet/minecraft/util/RandomSource;)V", shift = At.Shift.AFTER), cancellable = true)
+    @Inject(method = "lambda$getOffer$0(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/util/RandomSource;Lnet/minecraft/resources/ResourceKey;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/enchantment/EnchantmentHelper;enchantItemFromProvider(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/core/RegistryAccess;Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/world/DifficultyInstance;Lnet/minecraft/util/RandomSource;)V", shift = At.Shift.AFTER), cancellable = true)
     private static void method_59950Mixin(ItemStack itemStack, Level world, Entity entity, RandomSource random, ResourceKey<EnchantmentProvider> key, CallbackInfo info) {
         if (entity instanceof Player playerEntity) {
             if (playerEntity.isCreative()) {

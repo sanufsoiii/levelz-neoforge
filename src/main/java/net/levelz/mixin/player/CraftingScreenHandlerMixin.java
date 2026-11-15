@@ -24,7 +24,7 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 @Mixin(CraftingMenu.class)
 public class CraftingScreenHandlerMixin {
 
-    @Inject(method = "slotChangedCraftingGrid", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/ResultContainer;setItem(ILnet/minecraft/world/item/ItemStack;)V"), locals = LocalCapture.CAPTURE_FAILSOFT, cancellable = true)
+    @Inject(method = "slotChangedCraftingGrid", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/ResultContainer;setItem(ILnet/minecraft/world/item/ItemStack;)V"), locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
     private static void updateResultMixin(AbstractContainerMenu handler, Level world, Player player, CraftingContainer craftingInventory, ResultContainer resultInventory, @Nullable RecipeHolder<CraftingRecipe> recipe, CallbackInfo info, CraftingInput craftingRecipeInput, ServerPlayer serverPlayerEntity, ItemStack itemStack) {
         if (player.isCreative()) {
             return;

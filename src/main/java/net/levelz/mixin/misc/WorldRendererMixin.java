@@ -2,8 +2,6 @@ package net.levelz.mixin.misc;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.levelz.access.LevelManagerAccess;
 import net.levelz.init.ConfigInit;
 import net.minecraft.client.Minecraft;
@@ -22,7 +20,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Environment(EnvType.CLIENT)
 @Mixin(LevelRenderer.class)
 public abstract class WorldRendererMixin {
 

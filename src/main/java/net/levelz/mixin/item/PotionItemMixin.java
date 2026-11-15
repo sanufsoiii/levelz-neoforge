@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 @Mixin(PotionItem.class)
 public class PotionItemMixin {
 
-    @ModifyVariable(method = "method_57389", at = @At("HEAD"), argsOnly = true)
+    @ModifyVariable(method = "lambda$finishUsingItem$0(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/effect/MobEffectInstance;)V", at = @At("HEAD"), argsOnly = true)
     private static MobEffectInstance finishUsingMixin(MobEffectInstance original, Player playerEntity, LivingEntity livingEntity, MobEffectInstance statusEffectInstance) {
         return BonusHelper.potionEffectChanceBonus(playerEntity, original);
     }

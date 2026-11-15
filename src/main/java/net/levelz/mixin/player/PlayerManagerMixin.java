@@ -25,7 +25,7 @@ import java.util.Optional;
 @Mixin(PlayerList.class)
 public class PlayerManagerMixin {
 
-    @Inject(method = "placeNewPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/players/PlayerList;sendActivePlayerEffects(Lnet/minecraft/server/level/ServerPlayer;)V"), locals = LocalCapture.CAPTURE_FAILSOFT)
+    @Inject(method = "placeNewPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/players/PlayerList;sendActivePlayerEffects(Lnet/minecraft/server/level/ServerPlayer;)V"), locals = LocalCapture.CAPTURE_FAILHARD)
     private void onPlayerConnectMixin(Connection connection, ServerPlayer player, CommonListenerCookie clientData, CallbackInfo info, GameProfile gameProfile, GameProfileCache userCache, String string, Optional<CompoundTag> optional, ResourceKey<Level> registryKey, ServerLevel serverWorld, ServerLevel serverWorld2) {
         if (optional.isEmpty()) {
             if (ConfigInit.CONFIG.startPoints > 0) {

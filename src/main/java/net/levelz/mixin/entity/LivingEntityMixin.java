@@ -25,6 +25,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -51,7 +52,9 @@ public abstract class LivingEntityMixin extends Entity {
         }
     }
 
-    @ModifyVariable(method = "checkTotemDeathProtection", at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/world/entity/LivingEntity;getItemInHand(Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/item/ItemStack;", ordinal = 0))
+    // NeoForge's checkTotemDeathProtection has two ItemStack locals; modifying the getItemInHand call result directly
+    // avoids the ambiguous variable index of a @ModifyVariable(INVOKE_ASSIGN) on a method with an LVT.
+    @ModifyExpressionValue(method = "checkTotemDeathProtection", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;getItemInHand(Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/item/ItemStack;"))
     private ItemStack tryUseTotemMixin(ItemStack original) {
         if ((Object) this instanceof Player playerEntity && original.is(Items.TOTEM_OF_UNDYING)) {
             if (playerEntity.isCreative()) {

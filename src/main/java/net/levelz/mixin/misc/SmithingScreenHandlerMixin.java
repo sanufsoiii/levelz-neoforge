@@ -31,7 +31,7 @@ public abstract class SmithingScreenHandlerMixin extends ItemCombinerMenu {
         super(type, syncId, playerInventory, context);
     }
 
-    @Inject(method = "createResult", at = @At(value = "INVOKE_ASSIGN", target = "Ljava/util/List;get(I)Ljava/lang/Object;"), cancellable = true, locals = LocalCapture.CAPTURE_FAILSOFT)
+    @Inject(method = "createResult", at = @At(value = "INVOKE_ASSIGN", target = "Ljava/util/List;get(I)Ljava/lang/Object;"), cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD)
     private void updateResultMixin(CallbackInfo info, SmithingRecipeInput smithingRecipeInput, List<RecipeHolder<SmithingRecipe>> list) {
         if (!this.player.isCreative() && !((LevelManagerAccess) this.player).getLevelManager().hasRequiredCraftingLevel(list.get(0).value().assemble(smithingRecipeInput, this.player.level().registryAccess()).getItem())) {
             this.selectedRecipe = null;

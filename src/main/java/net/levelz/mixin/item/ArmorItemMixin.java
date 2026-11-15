@@ -19,7 +19,7 @@ import java.util.List;
 @Mixin(ArmorItem.class)
 public class ArmorItemMixin {
 
-    @Inject(method = "dispenseArmor", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;getEquipmentSlotForItem(Lnet/minecraft/world/item/ItemStack;)Lnet/minecraft/world/entity/EquipmentSlot;"), locals = LocalCapture.CAPTURE_FAILSOFT, cancellable = true)
+    @Inject(method = "dispenseArmor", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;getEquipmentSlotForItem(Lnet/minecraft/world/item/ItemStack;)Lnet/minecraft/world/entity/EquipmentSlot;"), locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
     private static void dispenseArmorMixin(BlockSource pointer, ItemStack armor, CallbackInfoReturnable<Boolean> info, BlockPos blockPos, List<LivingEntity> list, LivingEntity livingEntity) {
         if (livingEntity instanceof Player playerEntity) {
             if (playerEntity.isCreative()) {

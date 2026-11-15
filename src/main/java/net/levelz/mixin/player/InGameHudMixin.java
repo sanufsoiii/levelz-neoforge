@@ -1,7 +1,5 @@
 package net.levelz.mixin.player;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.levelz.access.LevelManagerAccess;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -12,7 +10,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
 
-@Environment(EnvType.CLIENT)
 @Mixin(Gui.class)
 public class InGameHudMixin {
 

@@ -84,10 +84,10 @@ public abstract class EnchantmentScreenHandlerMixin {
     }
 
 
-    @Inject(method = "method_17411", at = @At(value = "INVOKE", target = "Ljava/util/List;isEmpty()Z"))
-    private void method_17411Mixin(ItemStack itemStack, Level world, BlockPos pos, CallbackInfo ci, @Local(ordinal = 1) int j, @Local List<EnchantmentInstance> list) {
+    @Inject(method = "lambda$slotsChanged$0(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;)V", at = @At(value = "INVOKE", target = "Ljava/util/List;isEmpty()Z"))
+    private void emptyEnchantmentListMixin(ItemStack itemStack, Level world, BlockPos pos, CallbackInfo ci, @Local(ordinal = 0) int slot, @Local List<EnchantmentInstance> list) {
         if (list.isEmpty()) {
-            this.costs[j] = 0;
+            this.costs[slot] = 0;
         }
     }
 

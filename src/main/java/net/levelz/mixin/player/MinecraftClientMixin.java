@@ -1,7 +1,5 @@
 package net.levelz.mixin.player;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.levelz.access.LevelManagerAccess;
 import net.levelz.init.ConfigInit;
 import net.levelz.level.LevelManager;
@@ -20,7 +18,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Environment(EnvType.CLIENT)
 @Mixin(value = Minecraft.class, priority = 999)
 public class MinecraftClientMixin {
 

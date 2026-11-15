@@ -20,7 +20,7 @@ public abstract class WanderingTraderEntityMixin extends AbstractVillager {
         super(entityType, world);
     }
 
-    @Inject(method = "rewardTradeXp", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"), locals = LocalCapture.CAPTURE_FAILSOFT)
+    @Inject(method = "rewardTradeXp", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"), locals = LocalCapture.CAPTURE_FAILHARD)
     protected void afterUsingMixin(MerchantOffer offer, CallbackInfo info, int i) {
         BonusHelper.tradeXpBonus((ServerLevel) this.level(), this.getTradingPlayer(), this, i);
     }

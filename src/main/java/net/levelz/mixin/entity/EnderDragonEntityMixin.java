@@ -31,7 +31,7 @@ public abstract class EnderDragonEntityMixin extends Mob {
         super(entityType, world);
     }
 
-    @Inject(method = "tickDeath", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/ExperienceOrb;award(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/phys/Vec3;I)V", ordinal = 0), locals = LocalCapture.CAPTURE_FAILSOFT)
+    @Inject(method = "tickDeath", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/ExperienceOrb;award(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/phys/Vec3;I)V", ordinal = 0), locals = LocalCapture.CAPTURE_FAILHARD)
     protected void updatePostDeathMixin(CallbackInfo info, boolean f, int g) {
         if (ConfigInit.CONFIG.dragonXPMultiplier > 0.0F) {
             LevelExperienceOrbEntity.spawn((ServerLevel) this.level(), this.position(),
@@ -42,7 +42,7 @@ public abstract class EnderDragonEntityMixin extends Mob {
         }
     }
 
-    @Inject(method = "tickDeath", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/ExperienceOrb;award(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/phys/Vec3;I)V", ordinal = 1), locals = LocalCapture.CAPTURE_FAILSOFT)
+    @Inject(method = "tickDeath", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/ExperienceOrb;award(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/phys/Vec3;I)V", ordinal = 1), locals = LocalCapture.CAPTURE_FAILHARD)
     protected void updatePostDeathXPMixin(CallbackInfo info, boolean f, int g) {
         if (ConfigInit.CONFIG.dragonXPMultiplier > 0.0F) {
             LevelExperienceOrbEntity.spawn((ServerLevel) this.level(), this.position(),

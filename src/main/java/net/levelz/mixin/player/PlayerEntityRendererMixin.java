@@ -3,8 +3,6 @@ package net.levelz.mixin.player;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.levelz.access.ClientPlayerAccess;
 import net.levelz.access.ClientPlayerListAccess;
 import net.levelz.init.ConfigInit;
@@ -16,7 +14,6 @@ import net.minecraft.world.scores.PlayerTeam;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
-@Environment(EnvType.CLIENT)
 @Mixin(PlayerRenderer.class)
 public class PlayerEntityRendererMixin {
 

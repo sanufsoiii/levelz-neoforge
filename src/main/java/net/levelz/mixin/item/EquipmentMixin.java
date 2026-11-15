@@ -21,7 +21,7 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 @Mixin(Equipable.class)
 public interface EquipmentMixin {
 
-    @Inject(method = "swapWithEquipmentSlot", at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/world/entity/player/Player;getItemBySlot(Lnet/minecraft/world/entity/EquipmentSlot;)Lnet/minecraft/world/item/ItemStack;"), cancellable = true, locals = LocalCapture.CAPTURE_FAILSOFT)
+    @Inject(method = "swapWithEquipmentSlot", at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/world/entity/player/Player;getItemBySlot(Lnet/minecraft/world/entity/EquipmentSlot;)Lnet/minecraft/world/item/ItemStack;"), cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD)
     default void equipAndSwapMixin(Item item, Level world, Player user, InteractionHand hand, CallbackInfoReturnable<InteractionResultHolder<ItemStack>> info, ItemStack itemStack, EquipmentSlot equipmentSlot) {
         if (user.isCreative()) {
             return;
