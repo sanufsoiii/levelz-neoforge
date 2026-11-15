@@ -1,37 +1,15 @@
 package net.levelz.init;
 
-import eu.pb4.placeholders.api.PlaceholderResult;
-import eu.pb4.placeholders.api.Placeholders;
-import ht.treechop.api.TreeChopEvents;
-import net.fabricmc.loader.api.FabricLoader;
-import net.levelz.LevelzMain;
-import net.levelz.access.LevelManagerAccess;
-import net.levelz.level.LevelManager;
+import net.levelz.compat.TreeChopCompat;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModList;
 
 public class CompatInit {
 
-    public static void init() {
-        if (FabricLoader.getInstance().isModLoaded("placeholder-api")) {
-            Placeholders.register(LevelzMain.identifierOf("playerlevel"), (ctx, arg) -> {
-                if (ctx.hasPlayer()) {
-                    return PlaceholderResult.value(Integer.toString(((LevelManagerAccess) ctx.player()).getLevelManager().getOverallLevel()));
-                } else {
-                    return PlaceholderResult.invalid("No player!");
-                }
-            });
-        }
-        if (FabricLoader.getInstance().isModLoaded("treechop")) {
-            TreeChopEvents.BEFORE_CHOP.register((world, player, pos, state, chopData) -> {
-                LevelManager levelManager = ((LevelManagerAccess) player).getLevelManager();
-                if (!levelManager.hasRequiredStackLevel(player.getMainHandItem())) {
-                    player.level().destroyBlock(pos, false);
-                    return false;
-                } else if (!levelManager.hasRequiredMiningLevel(world.getBlockState(pos).getBlock())) {
-                    player.level().destroyBlock(pos, false);
-                    return false;
-                }
-                return true;
-            });
+    public static void init(IEventBus gameBus) {
+        // Placeholder API (eu.pb4) has no NeoForge 1.21.1 build; the original branch is kept in _excluded/ for reference.
+        if (ModList.get().isLoaded("treechop")) {
+            TreeChopCompat.register(gameBus);
         }
     }
 }

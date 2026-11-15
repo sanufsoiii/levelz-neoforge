@@ -73,12 +73,9 @@ dependencies {
     implementation "me.shedaniel.cloth:cloth-config-neoforge:${cloth_config_version}"
 
     // LibZ: required. Comes from mavenLocal after `./gradlew publishToMavenLocal` in ../../libz/port.
-    // -PwithoutLibz exists only for the baseline compile done before LibZ was published; drop it afterwards.
-    if (!project.hasProperty('withoutLibz')) {
-        implementation "net.libz:libz-neoforge:${libz_version}"
-        // Jankson is jar-in-jar inside LibZ; in dev it must be on the game classpath as a plain library.
-        additionalRuntimeClasspath "blue.endless:jankson:${jankson_version}"
-    }
+    // Jankson comes transitively from LibZ (it is both a normal dependency and jar-in-jar there); adding it a second
+    // time on the runtime classpath made the module layer resolve two modules named "jankson".
+    implementation "net.libz:libz-neoforge:${libz_version}"
 
     // Optional integrations, compile-only (absent at runtime is fine).
     compileOnly "dev.emi:emi-neoforge:${emi_version}"
